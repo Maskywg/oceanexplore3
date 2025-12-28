@@ -93,7 +93,6 @@
             visibility: hidden;
         }
 
-        /* 統一直式圖片容器 (2:3 比例) */
         .portrait-img-wrapper {
             width: 100%;
             aspect-ratio: 2 / 3; 
@@ -155,7 +154,7 @@
 </head>
 <body>
 
-    <!-- 背景音樂播放器 (由 JS 動態設定來源) -->
+    <!-- 背景音樂播放器 -->
     <audio id="bgMusic">
         您的瀏覽器不支援音樂播放。
     </audio>
@@ -262,14 +261,14 @@
             </div>
         </section>
 
-        <!-- Share Meetings -->
+        <!-- Share Meetings (調整為剩餘三場次併排) -->
         <section id="register" class="py-24 px-4 bg-white/[0.02]">
             <div class="max-w-[1400px] mx-auto">
                 <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 serif tracking-widest text-blue-200">2026 新書分享會場次</h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
                     <!-- 嘉義場次 -->
-                    <div class="glass-card p-8 flex flex-col justify-between border border-white/10">
+                    <div class="glass-card p-10 flex flex-col justify-between border border-white/10">
                         <div>
                             <div class="flex justify-between items-start mb-6">
                                 <h3 class="text-xl font-bold text-blue-300 serif">嘉義場</h3>
@@ -280,13 +279,13 @@
                                 <p class="flex items-center"><i class="far fa-clock w-6 text-blue-400"></i>15:00-16:00</p>
                                 <p class="flex items-center"><i class="fas fa-map-marker-alt w-6 text-blue-400"></i>嘉義</p>
                             </div>
-                            <p class="text-xs text-blue-100/40 italic serif mb-8">開放現場購書、簽名及合影。</p>
+                            <p class="text-sm text-blue-100/40 italic serif mb-10">開放現場購書、簽名及合影。</p>
                         </div>
                         <a href="https://drive.google.com/file/d/1C2gRtnyzqzthP0M5MpTeQwxZ0U5UHad2/view?usp=sharing" target="_blank" class="block w-full text-center py-3 rounded-xl btn-action font-bold text-white text-sm shadow-md">活動詳情</a>
                     </div>
 
                     <!-- 台南場次 -->
-                    <div class="glass-card p-8 flex flex-col justify-between border border-white/10">
+                    <div class="glass-card p-10 flex flex-col justify-between border border-white/10">
                         <div>
                             <div class="flex justify-between items-start mb-6">
                                 <h3 class="text-xl font-bold text-blue-300 serif">台南場</h3>
@@ -297,49 +296,24 @@
                                 <p class="flex items-center"><i class="far fa-clock w-6 text-blue-400"></i>15:00-16:00</p>
                                 <p class="flex items-center"><i class="fas fa-map-marker-alt w-6 text-blue-400"></i>台南</p>
                             </div>
-                            <p class="text-xs text-blue-100/40 italic serif mb-8">旅讀古都，感受土地文學氣息。</p>
+                            <p class="text-sm text-blue-100/40 italic serif mb-10">旅讀古都，感受土地文學氣息。</p>
                         </div>
                         <a href="https://drive.google.com/file/d/1cTzHfNhC38Cn8y1A54AJFiudw7CmDTnK/view?usp=sharing" target="_blank" class="block w-full text-center py-3 rounded-xl btn-action font-bold text-white text-sm shadow-md">活動詳情</a>
                     </div>
 
-                    <!-- 台北場次 1 (欒樹下咖啡) -->
-                    <div class="glass-card p-8 flex flex-col justify-between border-2 border-blue-400/30 shadow-[0_0_30px_rgba(0,210,255,0.1)]">
+                    <!-- 台北場次 (國際書展) -->
+                    <div class="glass-card p-10 flex flex-col justify-between border-2 border-blue-400/30 shadow-[0_0_40px_rgba(0,210,255,0.1)]">
                         <div>
                             <div class="flex justify-between items-start mb-6">
-                                <h3 class="text-xl font-bold text-blue-300 serif">台北 ‧ 海洋之約</h3>
-                                <span class="bg-blue-400 px-3 py-1 rounded-full text-[10px] font-bold text-slate-900 tracking-widest uppercase">台北場 I</span>
-                            </div>
-                            <div class="space-y-3 text-base text-blue-100/80 mb-6">
-                                <p class="flex items-center"><i class="far fa-calendar-alt w-6 text-blue-400"></i>01.28 (Wed)</p>
-                                <p class="flex items-center"><i class="far fa-clock w-6 text-blue-400"></i>18:00 PM</p>
-                                <div class="flex items-start">
-                                    <i class="fas fa-map-marker-alt w-6 mt-1 text-blue-400"></i>
-                                    <div>
-                                        <span class="block mb-1">欒樹下咖啡</span>
-                                        <div class="flex space-x-2">
-                                            <a href="https://maps.app.goo.gl/FqPvHFGVJAsZxrk6A" target="_blank" class="icon-link hover:text-blue-400" title="導航"><i class="fas fa-location-arrow text-[10px]"></i></a>
-                                            <a href="https://www.facebook.com/editorsbookscafe" target="_blank" class="icon-link hover:text-blue-400" title="FB"><i class="fab fa-facebook-f text-[10px]"></i></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfSgFkNAB4jH72d41d9uPf5_r2yn1cWTvgZNP-6Wec9hiiMDg/viewform" target="_blank" class="block w-full text-center py-3 rounded-xl btn-action font-bold text-white text-sm shadow-md">線上預約報名</a>
-                    </div>
-
-                    <!-- 台北場次 2 (國際書展) -->
-                    <div class="glass-card p-8 flex flex-col justify-between border border-blue-300/30">
-                        <div>
-                            <div class="flex justify-between items-start mb-6">
-                                <h3 class="text-xl font-bold text-blue-200 serif">台北 ‧ 國際書展</h3>
-                                <span class="bg-blue-300/10 px-3 py-1 rounded-full text-[10px] font-bold text-blue-300 border border-blue-300/20 tracking-widest uppercase">台北場 II</span>
+                                <h3 class="text-xl font-bold text-blue-300 serif">台北 ‧ 國際書展</h3>
+                                <span class="bg-blue-400 px-3 py-1 rounded-full text-[10px] font-bold text-slate-900 tracking-widest uppercase">推薦場次</span>
                             </div>
                             <div class="space-y-3 text-sm text-blue-100/90 mb-4">
                                 <p class="flex items-center"><i class="far fa-calendar-alt w-6 text-blue-400 text-base"></i>02.08 (Sun)</p>
                                 <p class="flex items-center"><i class="far fa-clock w-6 text-blue-400 text-base"></i>10:30-11:30</p>
                                 <p class="flex items-start"><i class="fas fa-map-marker-alt w-6 mt-1 text-blue-400 text-base"></i>國際書展．紅沙龍</p>
                             </div>
-                            <div class="bg-blue-400/5 p-3 rounded-xl mb-6">
+                            <div class="bg-blue-400/5 p-4 rounded-xl mb-6">
                                 <p class="text-xs text-blue-200/80 mb-2 leading-relaxed font-bold">與談人：陳春星</p>
                                 <p class="text-[10px] text-blue-100/60 leading-relaxed italic">演出：小老鷹樂團 (5首序詩)<br>x 不純人聲樂團 (1首合唱曲)</p>
                             </div>
@@ -378,7 +352,6 @@
             audio.load();
             audio.play().catch(e => console.log("Audio play blocked: ", e));
             
-            // 當播放結束，自動隨機下一個
             audio.onended = () => {
                 playRandomTrack();
             };
@@ -395,9 +368,7 @@
         }
 
         function enterExperience() {
-            // 點擊後隨機挑選一個音檔播放
             playRandomTrack();
-
             document.getElementById('splash-screen').style.opacity = '0';
             document.getElementById('splash-screen').style.pointerEvents = 'none';
             document.getElementById('main-content').style.opacity = '1';
@@ -407,6 +378,7 @@
             init3D();
         }
 
+        // --- 3D Ocean Background ---
         let scene, camera, renderer, particles, plane, pointLight;
         let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
 
