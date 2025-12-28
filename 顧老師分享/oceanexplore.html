@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>樂園時代．臺灣山城海｜顧蕙倩博士新書分享會</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #000911;
+            color: white;
+            scroll-behavior: smooth;
+            overflow: hidden;
+        }
+
+        h1, h2, h3, .serif { font-family: 'Noto Serif TC', serif; }
+
+        #canvas-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+        }
+
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #001220 0%, #000000 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s ease;
+            overflow: hidden;
+        }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-10px);
+        }
+
+        .island-tag {
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+            padding: 2px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #7ee8fa 0%, #eec0c6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: white;
+        }
+        .btn-action:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 210, 255, 0.4); }
+        
+        #music-control {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 100;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* 統一直式圖片容器 (2:3 比例) */
+        .portrait-img-wrapper {
+            width: 100%;
+            aspect-ratio: 2 / 3; 
+            overflow: hidden;
+            background: rgba(255,255,255,0.02);
+            position: relative;
+        }
+        .portrait-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 1.2s ease;
+        }
+        .glass-card:hover .portrait-img-wrapper img {
+            transform: scale(1.15);
+        }
+
+        .pulse-btn {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 210, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 210, 255, 0); }
+        }
+
+        .quote-line {
+            font-style: italic;
+            opacity: 0.8;
+            position: relative;
+            display: inline-block;
+        }
+        .quote-line::before, .quote-line::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 30px;
+            height: 1px;
+            background: rgba(255,255,255,0.3);
+        }
+        .quote-line::before { right: 110%; }
+        .quote-line::after { left: 110%; }
+
+        .icon-link {
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .icon-link:hover {
+            background: rgba(0, 210, 255, 0.2);
+            color: #7ee8fa;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 背景音樂播放器 (由 JS 動態設定來源) -->
+    <audio id="bgMusic">
+        您的瀏覽器不支援音樂播放。
+    </audio>
+
+    <!-- 音樂控制懸浮鍵 -->
+    <div id="music-control" onclick="toggleMusic()">
+        <i id="music-icon" class="fas fa-pause text-blue-300"></i>
+    </div>
+
+    <!-- 啟程頁面 -->
+    <div id="splash-screen">
+        <div class="text-center px-4">
+            <p class="island-tag mb-6 opacity-80 uppercase tracking-[0.3em]">文學朝聖之旅</p>
+            <h1 class="text-4xl md:text-6xl font-bold mb-8 gradient-text serif tracking-[0.2em]">樂園時代</h1>
+            <button onclick="enterExperience()" class="pulse-btn btn-action px-12 py-4 rounded-full font-bold text-white text-xl tracking-widest group">
+                啟程 ‧ 聽見島嶼
+                <i class="fas fa-chevron-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <main id="main-content" class="relative z-10 opacity-0 transition-opacity duration-1000">
+        
+        <!-- Hero Section -->
+        <section class="min-h-screen flex flex-col items-center justify-center px-4 text-center">
+            <div class="max-w-4xl mx-auto">
+                <p class="island-tag mb-4">文學朝聖之旅 系列 4</p>
+                <h1 class="text-5xl md:text-8xl font-bold mb-4 gradient-text serif">樂園時代</h1>
+                <p class="text-2xl md:text-3xl text-blue-100/90 mb-6 serif">臺灣山城海 ‧ 顧蕙倩 博士 著</p>
+                
+                <!-- 引言置於標題下 -->
+                <div class="mb-12">
+                    <p class="text-xl md:text-2xl quote-line serif text-blue-200 tracking-widest">聽見，島嶼的聲音</p>
+                </div>
+
+                <p class="text-lg text-blue-200/60 mb-12 tracking-[0.3em] font-light">全新文字 x 音樂聆聽體驗 ‧ 澎湖褒歌創作分享</p>
+                
+                <div class="flex flex-wrap justify-center gap-6">
+                    <a href="#register" class="btn-action px-10 py-3 rounded-full font-bold text-white shadow-xl text-lg">報名分享會</a>
+                    <a href="#islands" class="glass-card px-10 py-3 rounded-full font-bold hover:bg-white/10 transition-all text-lg">探索南方四島</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Book Introduction -->
+        <section class="py-24 px-4">
+            <div class="max-w-5xl mx-auto glass-card p-8 md:p-12">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold mb-8 serif border-l-4 border-blue-400 pl-4">關於本書</h2>
+                        <p class="text-blue-100/80 leading-relaxed mb-8 text-lg">
+                            《樂園時代》引領讀者深入臺灣的山城海景。本次分享會特別聚焦澎湖「南方四島」，結合詩文與現場音樂分享，帶您領略土地的溫度。
+                        </p>
+                        <ul class="space-y-4 text-blue-200/70">
+                            <li><i class="fas fa-music mr-3 text-blue-400"></i> 聽顧顧分享澎湖褒歌與音樂創作</li>
+                            <li><i class="fas fa-feather-alt mr-3 text-blue-400"></i> 文學創作與譜曲的心路歷程</li>
+                            <li><i class="fas fa-book-open mr-3 text-blue-400"></i> 商鼎數位出版 精心呈現</li>
+                        </ul>
+                    </div>
+                    <div class="relative h-80 rounded-2xl overflow-hidden border border-white/10">
+                        <img src="images/main.png" alt="樂園時代" class="w-full h-full object-cover opacity-60" onerror="this.src='https://placehold.co/600x800/001220/7ee8fa?text=Paradise+Era';">
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                             <p class="serif text-blue-100/30 text-xs tracking-[0.5em] uppercase">The Sound of Islands</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Four Islands (直式) -->
+        <section id="islands" class="py-24 px-4">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-20 serif tracking-widest">南方四島：啟程與之路</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-[1400px] mx-auto">
+                <div class="glass-card text-center">
+                    <div class="portrait-img-wrapper"><img src="images/1.png" alt="東吉嶼"></div>
+                    <div class="p-8">
+                        <p class="text-yellow-400 text-xs tracking-widest mb-2 uppercase font-bold">啟明之路 ‧ 〈繁露〉</p>
+                        <h3 class="text-2xl font-bold serif gradient-text">東吉嶼</h3>
+                    </div>
+                </div>
+                <div class="glass-card text-center">
+                    <div class="portrait-img-wrapper"><img src="images/2.png" alt="西吉嶼"></div>
+                    <div class="p-8">
+                        <p class="text-blue-400 text-xs tracking-widest mb-2 uppercase font-bold">寂靜之路 ‧ 〈雨露〉</p>
+                        <h3 class="text-2xl font-bold serif gradient-text">西吉嶼</h3>
+                    </div>
+                </div>
+                <div class="glass-card text-center">
+                    <div class="portrait-img-wrapper"><img src="images/3.png" alt="東嶼坪"></div>
+                    <div class="p-8">
+                        <p class="text-green-400 text-xs tracking-widest mb-2 uppercase font-bold">手作之路 ‧ 〈朝露〉</p>
+                        <h3 class="text-2xl font-bold serif gradient-text">東嶼坪</h3>
+                    </div>
+                </div>
+                <div class="glass-card text-center">
+                    <div class="portrait-img-wrapper"><img src="images/4.png" alt="西嶼坪"></div>
+                    <div class="p-8">
+                        <p class="text-red-400 text-xs tracking-widest mb-2 uppercase font-bold">多漢之路 ‧ 〈夕露〉</p>
+                        <h3 class="text-2xl font-bold serif gradient-text">西嶼坪</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Share Meetings -->
+        <section id="register" class="py-24 px-4 bg-white/[0.02]">
+            <div class="max-w-[1400px] mx-auto">
+                <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 serif tracking-widest text-blue-200">2026 新書分享會場次</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
+                    <!-- 嘉義場次 -->
+                    <div class="glass-card p-8 flex flex-col justify-between border border-white/10">
+                        <div>
+                            <div class="flex justify-between items-start mb-6">
+                                <h3 class="text-xl font-bold text-blue-300 serif">嘉義場</h3>
+                                <span class="bg-blue-500/10 px-3 py-1 rounded-full text-[10px] font-bold text-blue-300 border border-blue-500/20">Free!</span>
+                            </div>
+                            <div class="space-y-3 text-base text-blue-100/80 mb-6">
+                                <p class="flex items-center"><i class="far fa-calendar-alt w-6 text-blue-400"></i>01.10 (Sat)</p>
+                                <p class="flex items-center"><i class="far fa-clock w-6 text-blue-400"></i>15:00-16:00</p>
+                                <p class="flex items-center"><i class="fas fa-map-marker-alt w-6 text-blue-400"></i>嘉義</p>
+                            </div>
+                            <p class="text-xs text-blue-100/40 italic serif mb-8">開放現場購書、簽名及合影。</p>
+                        </div>
+                        <a href="https://drive.google.com/file/d/1C2gRtnyzqzthP0M5MpTeQwxZ0U5UHad2/view?usp=sharing" target="_blank" class="block w-full text-center py-3 rounded-xl btn-action font-bold text-white text-sm shadow-md">活動詳情</a>
+                    </div>
+
+                    <!-- 台南場次 -->
+                    <div class="glass-card p-8 flex flex-col justify-between border border-white/10">
+                        <div>
+                            <div class="flex justify-between items-start mb-6">
+                                <h3 class="text-xl font-bold text-blue-300 serif">台南場</h3>
+                                <span class="bg-blue-500/10 px-3 py-1 rounded-full text-[10px] font-bold text-blue-300 border border-blue-500/20">Free!</span>
+                            </div>
+                            <div class="space-y-3 text-base text-blue-100/80 mb-6">
+                                <p class="flex items-center"><i class="far fa-calendar-alt w-6 text-blue-400"></i>01.17 (Sat)</p>
+                                <p class="flex items-center"><i class="far fa-clock w-6 text-blue-400"></i>15:00-16:00</p>
+                                <p class="flex items-center"><i class="fas fa-map-marker-alt w-6 text-blue-400"></i>台南</p>
+                            </div>
+                            <p class="text-xs text-blue-100/40 italic serif mb-8">旅讀古都，感受土地文學氣息。</p>
+                        </div>
+                        <a href="https://drive.google.com/file/d/1cTzHfNhC38Cn8y1A54AJFiudw7CmDTnK/view?usp=sharing" target="_blank" class="block w-full text-center py-3 rounded-xl btn-action font-bold text-white text-sm shadow-md">活動詳情</a>
+                    </div>
+
+                    <!-- 台北場次 1 (欒樹下咖啡) -->
+                    <div class="glass-card p-8 flex flex-col justify-between border-2 border-blue-400/30 shadow-[0_0_30px_rgba(0,210,255,0.1)]">
+                        <div>
+                            <div class="flex justify-between items-start mb-6">
+                                <h3 class="text-xl font-bold text-blue-300 serif">台北 ‧ 海洋之約</h3>
+                                <span class="bg-blue-400 px-3 py-1 rounded-full text-[10px] font-bold text-slate-900 tracking-widest uppercase">台北場 I</span>
+                            </div>
+                            <div class="space-y-3 text-base text-blue-100/80 mb-6">
+                                <p class="flex items-center"><i class="far fa-calendar-alt w-6 text-blue-400"></i>01.28 (Wed)</p>
+                                <p class="flex items-center"><i class="far fa-clock w-6 text-blue-400"></i>18:00 PM</p>
+                                <div class="flex items-start">
+                                    <i class="fas fa-map-marker-alt w-6 mt-1 text-blue-400"></i>
+                                    <div>
+                                        <span class="block mb-1">欒樹下咖啡</span>
+                                        <div class="flex space-x-2">
+                                            <a href="https://maps.app.goo.gl/FqPvHFGVJAsZxrk6A" target="_blank" class="icon-link hover:text-blue-400" title="導航"><i class="fas fa-location-arrow text-[10px]"></i></a>
+                                            <a href="https://www.facebook.com/editorsbookscafe" target="_blank" class="icon-link hover:text-blue-400" title="FB"><i class="fab fa-facebook-f text-[10px]"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfSgFkNAB4jH72d41d9uPf5_r2yn1cWTvgZNP-6Wec9hiiMDg/viewform" target="_blank" class="block w-full text-center py-3 rounded-xl btn-action font-bold text-white text-sm shadow-md">線上預約報名</a>
+                    </div>
+
+                    <!-- 台北場次 2 (國際書展) -->
+                    <div class="glass-card p-8 flex flex-col justify-between border border-blue-300/30">
+                        <div>
+                            <div class="flex justify-between items-start mb-6">
+                                <h3 class="text-xl font-bold text-blue-200 serif">台北 ‧ 國際書展</h3>
+                                <span class="bg-blue-300/10 px-3 py-1 rounded-full text-[10px] font-bold text-blue-300 border border-blue-300/20 tracking-widest uppercase">台北場 II</span>
+                            </div>
+                            <div class="space-y-3 text-sm text-blue-100/90 mb-4">
+                                <p class="flex items-center"><i class="far fa-calendar-alt w-6 text-blue-400 text-base"></i>02.08 (Sun)</p>
+                                <p class="flex items-center"><i class="far fa-clock w-6 text-blue-400 text-base"></i>10:30-11:30</p>
+                                <p class="flex items-start"><i class="fas fa-map-marker-alt w-6 mt-1 text-blue-400 text-base"></i>國際書展．紅沙龍</p>
+                            </div>
+                            <div class="bg-blue-400/5 p-3 rounded-xl mb-6">
+                                <p class="text-xs text-blue-200/80 mb-2 leading-relaxed font-bold">與談人：陳春星</p>
+                                <p class="text-[10px] text-blue-100/60 leading-relaxed italic">演出：小老鷹樂團 (5首序詩)<br>x 不純人聲樂團 (1首合唱曲)</p>
+                            </div>
+                        </div>
+                        <a href="https://drive.google.com/file/d/1x4n6QuTjj88N-tnDt9aDBDTxm6VNwaSr/view?usp=sharing" target="_blank" class="block w-full text-center py-3 rounded-xl btn-action font-bold text-white text-sm shadow-md">活動詳情</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="py-20 px-4 border-t border-white/5 text-center">
+            <p class="text-2xl font-bold gradient-text serif mb-3">樂園時代．臺灣山城海</p>
+            <p class="text-blue-200/20 text-[10px] tracking-[0.2em] uppercase">© 2026 Dr. Ku Hui-Chien ‧ Paradise Era Tour ‧ 文學朝聖之旅系列 4</p>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- 隨機播放清單配置 ---
+        const playlist = [
+            'audio/1.mp3',
+            'audio/2.mp3',
+            'audio/3.mp3',
+            'audio/4.mp3'
+        ];
+
+        const audio = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('music-control');
+        const musicIcon = document.getElementById('music-icon');
+
+        // 隨機播放邏輯
+        function playRandomTrack() {
+            const randomIndex = Math.floor(Math.random() * playlist.length);
+            audio.src = playlist[randomIndex];
+            audio.load();
+            audio.play().catch(e => console.log("Audio play blocked: ", e));
+            
+            // 當播放結束，自動隨機下一個
+            audio.onended = () => {
+                playRandomTrack();
+            };
+        }
+
+        function toggleMusic() {
+            if (audio.paused) { 
+                audio.play(); 
+                musicIcon.className = 'fas fa-pause text-blue-300'; 
+            } else { 
+                audio.pause(); 
+                musicIcon.className = 'fas fa-play text-blue-300'; 
+            }
+        }
+
+        function enterExperience() {
+            // 點擊後隨機挑選一個音檔播放
+            playRandomTrack();
+
+            document.getElementById('splash-screen').style.opacity = '0';
+            document.getElementById('splash-screen').style.pointerEvents = 'none';
+            document.getElementById('main-content').style.opacity = '1';
+            musicBtn.style.opacity = '1'; 
+            musicBtn.style.visibility = 'visible';
+            document.body.style.overflow = 'auto';
+            init3D();
+        }
+
+        let scene, camera, renderer, particles, plane, pointLight;
+        let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+
+        function init3D() {
+            if (scene) return;
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x000911, 0.012);
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 8, 45);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            const geometry = new THREE.PlaneGeometry(240, 240, 110, 110);
+            const material = new THREE.MeshPhongMaterial({ color: 0x002e54, specular: 0x00d2ff, shininess: 150, transparent: true, opacity: 0.8 });
+            plane = new THREE.Mesh(geometry, material);
+            plane.rotation.x = -Math.PI / 2.3; plane.position.y = -18;
+            scene.add(plane);
+            scene.add(new THREE.AmbientLight(0x001529, 3.5));
+            pointLight = new THREE.PointLight(0x00d2ff, 5, 180);
+            pointLight.position.set(20, 40, 20);
+            scene.add(pointLight);
+
+            const pCount = 1200, pGeometry = new THREE.BufferGeometry(), pPositions = new Float32Array(pCount * 3);
+            for(let i=0; i<pCount; i++) { pPositions[i*3] = (Math.random() - 0.5) * 250; pPositions[i*3+1] = (Math.random() - 0.5) * 120; pPositions[i*3+2] = (Math.random() - 0.5) * 250; }
+            pGeometry.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+            particles = new THREE.Points(pGeometry, new THREE.PointsMaterial({ color: 0x7ee8fa, size: 0.12, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending }));
+            scene.add(particles);
+
+            window.addEventListener('mousemove', (e) => { mouseX = (e.clientX - window.innerWidth / 2) / 120; mouseY = (e.clientY - window.innerHeight / 2) / 120; });
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = Date.now() * 0.0007;
+            const pos = plane.geometry.attributes.position.array;
+            for (let i = 0; i < pos.length; i += 3) { pos[i + 2] = Math.sin(pos[i] * 0.12 + time * 1.5) * 2.5 + Math.cos(pos[i+1] * 0.15 + time * 0.8) * 1.5; }
+            plane.geometry.attributes.position.needsUpdate = true;
+            targetX += (mouseX - targetX) * 0.05; targetY += (mouseY - targetY) * 0.05;
+            camera.rotation.y = -targetX * 0.08; camera.rotation.x = -targetY * 0.08;
+            particles.rotation.y += 0.0004;
+            pointLight.intensity = 4 + Math.sin(time * 1.5) * 1.5;
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => { if (renderer) { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); } });
+    </script>
+</body>
+</html>
